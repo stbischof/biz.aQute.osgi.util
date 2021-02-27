@@ -36,6 +36,7 @@ public class Activator implements BundleActivator {
 	public void start(BundleContext context) throws Exception {
 		this.context = context;
 		registerConverter(context);
+		register(DTOFramework.class);
 		register(Diagnostics.class);
 		register(Builtin.class);
 		register(Log.class);
