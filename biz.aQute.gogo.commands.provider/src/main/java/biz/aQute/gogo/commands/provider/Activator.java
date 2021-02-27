@@ -122,7 +122,8 @@ public class Activator implements BundleActivator {
 			Constructor<T> constructor = c.getConstructor(BundleContext.class, DTOFormatter.class);
 
 			Hashtable<String, Object> properties = new Hashtable<>();
-			properties.put(CommandProcessor.COMMAND_SCOPE, "bnd");
+			properties.put(CommandProcessor.COMMAND_SCOPE, "aQute");
+
 			Set<String> commands = new TreeSet<>();
 			for (Method m : c.getMethods()) {
 				Descriptor d = m.getAnnotation(Descriptor.class);
@@ -132,8 +133,6 @@ public class Activator implements BundleActivator {
 						.toLowerCase());
 			}
 			T service = constructor.newInstance(context, formatter);
-
-			properties.put(CommandProcessor.COMMAND_SCOPE, "aQute");
 
 			String[] functions = commands.stream()
 				.map(name -> name.startsWith("_") ? name.substring(1) : name)
