@@ -1,4 +1,4 @@
-package biz.aQute.gogo.commands.provider;
+package biz.aQute.gogo.commands.provider.base;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -16,7 +16,7 @@ public class DisplayUtil {
 	static final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("kk:ss.S")
 		.withZone(ZoneId.of("UTC"));
 
-	static String objectClass(Map<String, Object> map) {
+	public static String objectClass(Map<String, Object> map) {
 		String[] object = (String[]) map.get(Constants.OBJECTCLASS);
 
 		return objectClass(object);
@@ -28,7 +28,7 @@ public class DisplayUtil {
 			.collect(Collectors.joining("\n"));
 	}
 
-	static String shorten(String className) {
+	public static String shorten(String className) {
 		String[] split = className.split("\\.");
 		StringBuilder sb = new StringBuilder();
 		sb.append(split[split.length - 1]);

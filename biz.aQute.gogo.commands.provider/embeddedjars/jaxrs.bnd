@@ -1,0 +1,3 @@
+Private-Package: biz.aQute.gogo.commands.provider.jaxrs
+Import-Package: \
+	*;'resolution:'=optional

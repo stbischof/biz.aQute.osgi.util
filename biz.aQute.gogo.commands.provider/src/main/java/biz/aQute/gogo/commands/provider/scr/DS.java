@@ -1,7 +1,5 @@
-package biz.aQute.gogo.commands.provider;
+package biz.aQute.gogo.commands.provider.scr;
 
-import java.io.Closeable;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -16,45 +14,56 @@ import java.util.stream.Stream;
 
 import org.apache.felix.service.command.Descriptor;
 import org.apache.felix.service.command.Parameter;
+import org.apache.felix.service.command.annotations.GogoCommand;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.dto.ServiceReferenceDTO;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.runtime.ServiceComponentRuntime;
 import org.osgi.service.component.runtime.dto.ComponentConfigurationDTO;
 import org.osgi.service.component.runtime.dto.ComponentDescriptionDTO;
 import org.osgi.service.component.runtime.dto.ReferenceDTO;
 import org.osgi.service.component.runtime.dto.SatisfiedReferenceDTO;
 import org.osgi.service.component.runtime.dto.UnsatisfiedReferenceDTO;
-import org.osgi.util.tracker.ServiceTracker;
 
 import aQute.lib.strings.Strings;
 import biz.aQute.gogo.commands.dtoformatter.DTOFormatter;
 import biz.aQute.gogo.commands.dtoformatter.Wrapper;
+import biz.aQute.gogo.commands.provider.base.DisplayUtil;
 
-public class DS implements Closeable {
+@GogoCommand(scope = "aQute", function = {
+	"ds", "why"
+})
+@Component(service = DS.class, immediate = true)
+public class DS {
 
-	final ServiceTracker<ServiceComponentRuntime, ServiceComponentRuntime>	scr;
-	final BundleContext														context;
-	final AtomicLong														componentDescriptionNextIndex	= new AtomicLong(
-		-1);
-	final Map<ComponentDescriptionId, Long>									descriptionToIndex				= new HashMap<>();
+	final BundleContext						context;
+	final AtomicLong						componentDescriptionNextIndex	= new AtomicLong(-1);
+	final Map<ComponentDescriptionId, Long>	descriptionToIndex				= new HashMap<>();
+	private ServiceComponentRuntime			runtime;
 
-	public DS(BundleContext context, DTOFormatter formatter) {
+	@Activate
+	public DS(BundleContext context, @Reference
+	ServiceComponentRuntime runtime, @Reference
+	DTOFormatter formatter) {
 		this.context = context;
+		this.runtime = runtime;
 		dtos(formatter);
-		scr = new ServiceTracker<>(context, ServiceComponentRuntime.class, null);
-		scr.open();
 	}
 
 	@Descriptor("Show the list of available components")
 	public Object ds(@Parameter(names = {
 		"-c", "--config"
-	}, presentValue = "true", absentValue = "false") boolean configs, @Parameter(names = {
+	}, presentValue = "true", absentValue = "false")
+	boolean configs, @Parameter(names = {
 		"-b", "--bundle"
-	}, absentValue = "0") Bundle bs[]) {
+	}, absentValue = "0")
+	Bundle bs[]) {
 
 		if (bs == null || bs.length == 1 && bs[0].getBundleId() == 0)
 			bs = new Bundle[0];
@@ -74,10 +83,10 @@ public class DS implements Closeable {
 	public Object ds() {
 
 		return getScr().getComponentDescriptionDTOs(context.getBundles())
-				.stream()
-				.flatMap(d -> getScr().getComponentConfigurationDTOs(d)
-					.stream())
-				.collect(Collectors.toList());
+			.stream()
+			.flatMap(d -> getScr().getComponentConfigurationDTOs(d)
+				.stream())
+			.collect(Collectors.toList());
 	}
 
 	//
@@ -184,12 +193,7 @@ public class DS implements Closeable {
 	}
 
 	private ServiceComponentRuntime getScr() {
-		return scr.getService();
-	}
-
-	@Override
-	public void close() throws IOException {
-		scr.close();
+		return runtime;
 	}
 
 	void dtos(DTOFormatter formatter) {

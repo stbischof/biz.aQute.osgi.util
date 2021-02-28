@@ -1,13 +1,16 @@
-package biz.aQute.gogo.commands.provider;
+package biz.aQute.gogo.commands.provider.base;
 
 import java.io.Closeable;
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.net.URL;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -19,6 +22,7 @@ import org.apache.felix.service.command.Function;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleException;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
 
@@ -35,16 +39,43 @@ public class Activator implements BundleActivator {
 	@Override
 	public void start(BundleContext context) throws Exception {
 		this.context = context;
+		context.registerService(DTOFormatter.class, formatter, new Hashtable<>());
+
 		registerConverter(context);
 		register(DTOFramework.class);
 		register(Diagnostics.class);
 		register(Builtin.class);
-		register(Log.class);
-		register(DS.class);
 		register(Help.class);
 		register(Files.class);
 		register(Inspect.class);
 		register(Core.class);
+
+
+		List<String> jarNames = List.of("log.jar", "scr.jar", "http.jar", "jaxrs.jar");
+
+		for (String jarName : jarNames) {
+
+			try {
+				URL url = context.getBundle()
+					.getResource(jarName);
+				Bundle b = context.installBundle(url.toString(), url.openStream());
+				b.start();
+
+				closeables.add(new Closeable() {
+					@Override
+					public void close() throws IOException {
+						try {
+							b.stop();
+							b.uninstall();
+						} catch (BundleException e) {
+							e.printStackTrace();
+						}
+					}
+				});
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	private void registerConverter(BundleContext context) {

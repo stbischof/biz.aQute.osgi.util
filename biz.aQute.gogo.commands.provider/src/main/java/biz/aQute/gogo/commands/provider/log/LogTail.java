@@ -1,4 +1,4 @@
-package biz.aQute.gogo.commands.provider;
+package biz.aQute.gogo.commands.provider.log;
 
 import org.apache.felix.service.command.CommandSession;
 import org.osgi.service.log.LogEntry;

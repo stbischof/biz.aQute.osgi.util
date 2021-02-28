@@ -2,7 +2,7 @@
 # biz.aQute.gogo.commands.provider PROVIDER BUNDLE
 #
 
-Bundle-Activator:       biz.aQute.gogo.commands.provider.Activator
+Bundle-Activator:       biz.aQute.gogo.commands.provider.base.Activator
 DynamicImport-Package   *
 -buildpath: \
 	osgi.annotation,\
@@ -13,7 +13,10 @@ DynamicImport-Package   *
 	org.osgi.framework;version='1.8.0',\
 	aQute.libg,\
 	osgi.core,\
-	org.osgi.service.component
+	org.osgi.service.component,\
+	org.osgi.service.jaxrs,\
+	org.osgi.service.http,\
+	org.osgi.service.http.whiteboard
 	
 -conditionalpackage: aQute.lib*
 
@@ -42,3 +45,20 @@ DynamicImport-Package   *
 	org.osgi.util.function;version='[1.1.0,1.1.1)',\
 	org.osgi.util.promise;version='[1.1.1,1.1.2)'
 -runee: JavaSE-1.8
+
+# Embedd Jars from demo and embeddedjar packages
+-make: (*).(jar); type=bnd; recipe="${.}/embeddedjars/$1.bnd"
+
+-includeresource:\
+	http.jar,\
+	jaxrs.jar,\
+	scr.jar,\
+	log.jar
+	
+Export-Package: biz.aQute.gogo.commands.dtoformatter, \
+				biz.aQute.gogo.commands.provider.base
+			
+Private-Package: !biz.aQute.gogo.commands.provider.http, \
+				!biz.aQute.gogo.commands.provider.log, \
+				!biz.aQute.gogo.commands.provider.jaxrs, \
+				!biz.aQute.gogo.commands.provider.scr

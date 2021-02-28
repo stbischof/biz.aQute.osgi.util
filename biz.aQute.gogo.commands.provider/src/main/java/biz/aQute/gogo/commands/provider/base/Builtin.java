@@ -1,4 +1,4 @@
-package biz.aQute.gogo.commands.provider;
+package biz.aQute.gogo.commands.provider.base;
 
 import static java.nio.file.Files.newOutputStream;
 

@@ -1,4 +1,4 @@
-package biz.aQute.gogo.commands.provider;
+package biz.aQute.gogo.commands.provider.base;
 
 import java.io.IOException;
 import java.io.InputStream;

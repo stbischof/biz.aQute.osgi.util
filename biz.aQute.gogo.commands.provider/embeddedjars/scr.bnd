@@ -1,0 +1,3 @@
+Private-Package: biz.aQute.gogo.commands.provider.scr
+Import-Package: \
+	*;'resolution:'=optional

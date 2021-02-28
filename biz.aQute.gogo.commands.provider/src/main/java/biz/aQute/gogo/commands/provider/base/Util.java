@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package biz.aQute.gogo.commands.provider;
+package biz.aQute.gogo.commands.provider.base;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
